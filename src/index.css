@@ -1,13 +1,37 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "NMSNeo1";
+  src: url("/public/font/NanumSquareNeoTTF-aLt.woff2") format("woff2");
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@font-face {
+  font-family: "NMSNeo2";
+  src: url("/public/font/NanumSquareNeoTTF-bRg.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "NMSNeo3";
+  src: url("/public/font/NanumSquareNeoTTF-cBd.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "NMSNeo4";
+  src: url("/public/font/NanumSquareNeoTTF-dEb.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "NMSNeo5";
+  src: url("/public/font/NanumSquareNeoTTF-eHv.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "NMSNeo6";
+  src: url("/public/font/NanumSquareNeo-Variable.woff2") format("woff2");
+}
+
+html {
+  background-color: #F2F5FA;
 }
