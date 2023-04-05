@@ -15,7 +15,7 @@ module.exports = {
         pointColor: "#0C54F3",
         boardColor: "#A8AFB5",
         secretColor: "#B9C0FF",
-        grayColor: "#F2F2F2",
+        grayColor: "#F5F5F5",
         cancelBtnColor: "#D9D9D9",
         bgColor: "#FBFBFB",
         borderColor: "#A2A2A2",

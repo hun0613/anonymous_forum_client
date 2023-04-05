@@ -128,6 +128,7 @@ const commentSettingCommentId = atom({
 const adminName = atom({
   key: "adminName",
   default: "",
+  effects_UNSTABLE: [persistAtom],
 });
 
 // 댓글수정 시 default content 값
@@ -140,6 +141,38 @@ const defaultCommentContentState = atom({
 const updateCommentModalState = atom({
   key: "updateCommentModalState",
   default: false,
+});
+
+// 페이지네이션 상태
+
+// 한 페이지당 보여줄 게시글 수
+const pageAmountState = atom({
+  key: "pageAmountState",
+  default: 5,
+});
+
+// 전체 페이지 갯수
+const totalPageAmountState = atom({
+  key: "totalPageAmountState",
+  default: 0,
+});
+
+// pageSetAmount개씩 자른 페이지 묶음 수
+const pageSetState = atom({
+  key: "pageSetState",
+  default: 1,
+});
+
+// 현재 페이지
+const currPageState = atom({
+  key: "currPageState",
+  default: 1,
+});
+
+// 한 묶음당 보여질 페이지 개수
+const pageSetAmountState = atom({
+  key: "pageSetAmountState",
+  default: 10,
 });
 
 export {
@@ -166,4 +199,9 @@ export {
   commentSettingCommentId,
   defaultCommentContentState,
   updateCommentModalState,
+  pageAmountState,
+  totalPageAmountState,
+  pageSetState,
+  currPageState,
+  pageSetAmountState,
 };

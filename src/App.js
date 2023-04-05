@@ -20,6 +20,8 @@ import {
   commentSettingCommentId,
   commentSettingModalState,
   updateCommentModalState,
+  currPageState,
+  pageAmountState,
 } from "./atom/atom";
 import useGetBoard from "./hooks/useGetBoard";
 import ModalContainer from "./components/reuse/ModalContainer";
@@ -34,9 +36,13 @@ import ReturnBtn from "./components/ReturnBtn";
 import DashBoard from "./components/DashBoard";
 import Footer from "./components/Footer";
 import UpdateCommentModal from "./components/UpdateCommentModal";
+import Pagination from "./components/Pagination";
+import MobilePagination from "./components/MobilePagination";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
+import useWindowSize from "./hooks/useWindowSize";
+import useGetOption from "./hooks/useGetOption";
 
 function App() {
   // setRecoilValue
@@ -57,9 +63,17 @@ function App() {
   const trigger = useRecoilValue(myBoardRefetchTrigger);
   const activeUpdateModal = useRecoilValue(updateModalState);
   const activeUpdateCommentModal = useRecoilValue(updateCommentModalState);
+  const currPage = useRecoilValue(currPageState);
+  const pageAmount = useRecoilValue(pageAmountState);
 
   // 게시글 조회 api요청함수 호출
   useGetBoard();
+
+  // 옵션 조회 api요청함수 호출
+  useGetOption();
+
+  // window width size
+  const width = useWindowSize();
 
   // react-query
   const { refetch } = useGetMyBoard(emailState);
@@ -106,24 +120,29 @@ function App() {
 
           {admin || user ? (
             <div className="w-full h-fit flex flex-col justify-center items-center mb-10">
-              {boardList.map((el) => {
-                return (
-                  <Content
-                    key={el.boardId}
-                    id={el.boardId}
-                    title={el.title}
-                    content={el.content}
-                    createAt={el.createAt}
-                    comment={el.comment}
-                  />
-                );
-              })}
+              {boardList
+                .slice((currPage - 1) * pageAmount, (currPage - 1) * pageAmount + pageAmount)
+                .map((el) => {
+                  return (
+                    <Content
+                      key={el.boardId}
+                      id={el.boardId}
+                      title={el.title}
+                      content={el.content}
+                      createAt={el.createAt}
+                      comment={el.comment}
+                    />
+                  );
+                })}
+              {/* 페이지 컴포넌트 */}
+              {width > 790 ? <Pagination /> : <MobilePagination />}
             </div>
           ) : (
             <DashBoard />
           )}
         </div>
 
+        {/* 푸터 컴포넌트 */}
         <Footer />
 
         {/* 글작성모달 */}

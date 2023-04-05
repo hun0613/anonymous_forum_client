@@ -13,7 +13,10 @@ import {
   updateCommentModalState,
   boardSettingModalState,
 } from "../atom/atom";
+import Swal from "sweetalert2";
 import { FiMoreHorizontal } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import useDeleteComment from "../hooks/useDeleteComment";
 
 const Comment = (comment) => {
   const time = new Date(comment.createAt);
@@ -26,10 +29,12 @@ const Comment = (comment) => {
     time.getSeconds(),
   ];
 
+  // react-query
+  const { mutate } = useDeleteComment();
+
   // useSetRecoilState
   const setSelectBoardId = useSetRecoilState(selectContentState); // 선택된 게시글 boardId
   const setSelectCommentDepth = useSetRecoilState(selectCommentDepthState); // 선택된 댓글 Depth
-  const setSelectCommentRefId = useSetRecoilState(selectCommentRefIdState); // 선택된 댓글 commentId (등록될 댓글의 refId로 사용)
   const setCommentModal = useSetRecoilState(commentModalState); // 댓글 입력창 컨트롤
   const setDefaultCommentContent = useSetRecoilState(defaultCommentContentState); // 댓글 수정 시 default 값
   const activeUpdateCommentModal = useSetRecoilState(updateCommentModalState);
@@ -43,14 +48,20 @@ const Comment = (comment) => {
   const [settingControlCommentId, setSettingControlCommentId] =
     useRecoilState(commentSettingCommentId);
   const [commentSettingModal, setCommentSettingModal] = useRecoilState(commentSettingModalState);
+  const [selectCommentRefId, setSelectCommentRefId] = useRecoilState(selectCommentRefIdState); // 선택된 댓글 commentId (등록될 댓글의 refId로 사용)
+
+  // useState
+  const [isDelete, setIsDelete] = useState(false);
 
   // 댓글 onClick 호출함수
   const handleClickComment = () => {
-    setSelectBoardId(comment.bundleId);
-    setSelectCommentDepth(comment.depth + 1);
-    setSelectCommentRefId(comment.commentId);
-    setCommentModal(true);
-    setCommentSettingModal(false);
+    if (!comment.delete) {
+      setSelectBoardId(comment.bundleId);
+      setSelectCommentDepth(comment.depth + 1);
+      setSelectCommentRefId(comment.commentId);
+      setCommentModal(true);
+      setCommentSettingModal(false);
+    }
   };
 
   // 댓글 설정버튼 onClick 호출함수
@@ -80,43 +91,70 @@ const Comment = (comment) => {
     setCommentSettingModal(false);
   };
 
+  const handleClickDelete = (event) => {
+    event.stopPropagation();
+    setSelectCommentRefId(comment.commentId);
+    setIsDelete(true);
+    setCommentSettingModal(false);
+    setSettingControlCommentId(0);
+  };
+
+  useEffect(() => {
+    if (selectCommentRefId !== 0 && isDelete) {
+      Swal.fire({
+        title: "정말 삭제하시겠습니까?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        customClass: "customSwal2",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          setIsDelete(false);
+          mutate(comment.commentId);
+        }
+      });
+      setSelectCommentRefId(0);
+      setIsDelete(false);
+    }
+  }, [selectCommentRefId]);
+
   return (
     <>
       <div
         className={
-          comment.admin
-            ? // admin속성이 있는 경우
+          comment.delete
+            ? // 삭제된 댓글인 경우
               comment.depth === 0
-              ? `relative tablet:max-w-[900px] w-[95%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
+              ? `relative tablet:max-w-[900px] w-[95%] min-h-[100px] h-fit bg-white drop-shadow-md rounded-md p-5 my-3 font-NMSNeo2`
               : comment.depth === 1
-              ? `relative tablet:max-w-[800px] w-[85%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
+              ? `relative tablet:max-w-[800px] w-[85%] min-h-[100px] h-fit bg-white drop-shadow-md rounded-md p-5 my-3 font-NMSNeo2`
               : comment.depth === 2
-              ? `relative tablet:max-w-[700px] w-[75%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
+              ? `relative tablet:max-w-[700px] w-[75%] min-h-[100px] h-fit bg-white drop-shadow-md rounded-md p-5 my-3 font-NMSNeo2`
               : comment.depth === 3
-              ? `relative tablet:max-w-[600px] w-[65%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
-              : `relative tablet:max-w-[500px] w-[55%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
-            : // admin속성이 없는 경우
+              ? `relative tablet:max-w-[600px] w-[65%] min-h-[100px] h-fit bg-white drop-shadow-md rounded-md p-5 my-3 font-NMSNeo2`
+              : `relative tablet:max-w-[500px] w-[55%] min-h-[100px] h-fit bg-white drop-shadow-md rounded-md p-5 my-3 font-NMSNeo2`
+            : // 삭제되지 않은 댓글인 경우
             comment.depth === 0
-            ? `relative tablet:max-w-[900px] w-[95%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
+            ? `relative tablet:max-w-[900px] w-[95%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-grayColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
             : comment.depth === 1
-            ? `relative tablet:max-w-[800px] w-[85%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
+            ? `relative tablet:max-w-[800px] w-[85%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-grayColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
             : comment.depth === 2
-            ? `relative tablet:max-w-[700px] w-[75%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
+            ? `relative tablet:max-w-[700px] w-[75%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-grayColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
             : comment.depth === 3
-            ? `relative tablet:max-w-[600px] w-[65%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
-            : `relative tablet:max-w-[500px] w-[55%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
+            ? `relative tablet:max-w-[600px] w-[65%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-grayColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
+            : `relative tablet:max-w-[500px] w-[55%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-grayColor rounded-md p-5 my-3 font-NMSNeo2 cursor-pointer`
         }
         onClick={handleClickComment}
       >
         <div className="relative w-full h-fit flex flex-col justify-center items-start">
           {/* setting btn */}
           {/* 관리자 로그인상태 && 본인이 작성한 글일 경우 */}
-          {admin && comment.admin === adminNameValue ? (
+          {admin && comment.admin === adminNameValue && !comment.delete ? (
             <FiMoreHorizontal
               className="absolute top-0 right-0 text-xl text-textColor hover:text-pointColor/30"
               onClick={handleClickSetting}
             />
-          ) : user && !comment.admin ? (
+          ) : user && !comment.admin && !comment.delete ? (
             <FiMoreHorizontal
               className="absolute top-0 right-0 text-xl text-textColor hover:text-pointColor/30"
               onClick={handleClickSetting}
@@ -133,7 +171,10 @@ const Comment = (comment) => {
                 수정하기
               </div>
 
-              <div className="w-full h-fit flex flex-col justify-center items-center text-sm font-NMSNeo3 text-negativeColor hover:text-negativeColor/50 cursor-pointer">
+              <div
+                className="w-full h-fit flex flex-col justify-center items-center text-sm font-NMSNeo3 text-negativeColor hover:text-negativeColor/50 cursor-pointer"
+                onClick={handleClickDelete}
+              >
                 삭제하기
               </div>
             </div>
@@ -141,17 +182,35 @@ const Comment = (comment) => {
 
           {/* admin속성이 있을 경우 관리자 아이콘 표기 */}
           {comment.admin ? (
-            <div className="w-fit h-fit flex flex-row justify-center items-center tablet:text-xs text-[10px] mb-2 bg-pointColor/90 rounded-md py-2 px-3 text-white font-NMSNeo2">
+            <div
+              className={
+                comment.delete
+                  ? `w-fit h-fit flex flex-row justify-center items-center tablet:text-xs text-[10px] mb-2 bg-pointColor/30 rounded-md py-2 px-3 text-white font-NMSNeo2`
+                  : `w-fit h-fit flex flex-row justify-center items-center tablet:text-xs text-[10px] mb-2 bg-pointColor/90 rounded-md py-2 px-3 text-white font-NMSNeo2`
+              }
+            >
               {`관리자 ${comment.admin}`}
             </div>
           ) : null}
           {/* 내용 */}
-          <div className="w-full h-fit flex flex-row justify-start items-center tablet:text-base text-sm mb-5 text-textColor">
+          <div
+            className={
+              comment.delete
+                ? `w-full h-fit flex flex-row justify-start items-center tablet:text-base text-sm mb-5 text-textColor/20`
+                : `w-full h-fit flex flex-row justify-start items-center tablet:text-base text-sm mb-5 text-textColor`
+            }
+          >
             {comment.content}
           </div>
         </div>
         {/* 작성일시 */}
-        <div className="w-full h-fit flex flex-row justify-end items-center tablet:text-sm text-xs text-textColor">
+        <div
+          className={
+            comment.delete
+              ? `w-full h-fit flex flex-row justify-end items-center tablet:text-sm text-xs text-textColor/20`
+              : `w-full h-fit flex flex-row justify-end items-center tablet:text-sm text-xs text-textColor`
+          }
+        >
           {`${year}년 ${month}월 ${day}일 ${hour}시 ${minute}분 ${second}초`}
         </div>
       </div>
@@ -169,6 +228,7 @@ const Comment = (comment) => {
               admin={el.admin}
               content={el.content}
               createAt={el.createAt}
+              delete={el.delete}
             />
           );
         }

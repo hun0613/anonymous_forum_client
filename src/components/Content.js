@@ -60,7 +60,7 @@ const Content = ({ id, title, content, createAt, comment }) => {
   const [boardSettingModal, setBoardSettingModal] = useRecoilState(boardSettingModalState); // 설정모달 컨트롤
 
   // useState
-  const [isDelte, setIsDelete] = useState(false); // 삭제, 수정 판별용 상태
+  const [isDelete, setIsDelete] = useState(false); // 삭제, 수정 판별용 상태
 
   // react-query
   const { mutate, isSuccess } = useDeleteBoard(); // 삭제요청
@@ -113,7 +113,7 @@ const Content = ({ id, title, content, createAt, comment }) => {
 
   // 게시글 클릭 시 발생하는 로직
   useEffect(() => {
-    if (selectContent !== 0 && isDelte) {
+    if (selectContent !== 0 && isDelete) {
       Swal.fire({
         title: "정말 삭제하시겠습니까?",
         icon: "question",
@@ -158,7 +158,7 @@ const Content = ({ id, title, content, createAt, comment }) => {
       {/* 게시글 */}
       {admin || user ? (
         <div
-          className="relative max-w-[1000px] w-[95%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-bgColor text-textColor rounded-md p-5 my-3 mt-16 font-NMSNeo2 cursor-pointer"
+          className="relative max-w-[1000px] w-[95%] min-h-[100px] h-fit bg-white drop-shadow-md hover:bg-grayColor text-textColor rounded-md p-5 my-3 mt-16 font-NMSNeo2 cursor-pointer"
           onClick={handleClickContent}
         >
           <div className="w-full h-fit flex flex-row justify-between items-start">
@@ -226,6 +226,7 @@ const Content = ({ id, title, content, createAt, comment }) => {
                   admin={el.admin}
                   content={el.content}
                   createAt={el.createAt}
+                  delete={el.delete}
                 />
               );
             }
