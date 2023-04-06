@@ -1,5 +1,6 @@
 import { atom } from "recoil";
 import { recoilPersist } from "recoil-persist";
+import useTransformDateForm from "../hooks/useTransformDateFormat";
 
 const { persistAtom } = recoilPersist();
 
@@ -143,6 +144,25 @@ const updateCommentModalState = atom({
   default: false,
 });
 
+// 디스플레이 설정 모달 컨트롤
+const displaySettingModalState = atom({
+  key: "displaySettingModalState",
+  default: false,
+});
+
+// // 차트 기간 시작범위
+
+// const startDateOfChart = atom({
+//   key: "startDateOfChart",
+//   default: useTransformDateForm(new Date(currTime.getTime() - 6 * 24 * 60 * 60 * 1000)),
+// });
+
+// // 차트 기간 종료범위
+// const endDateOfChart = atom({
+//   key: "endDateOfChart",
+//   default: useTransformDateForm(new Date()),
+// });
+
 // 페이지네이션 상태
 
 // 한 페이지당 보여줄 게시글 수
@@ -157,7 +177,7 @@ const totalPageAmountState = atom({
   default: 0,
 });
 
-// pageSetAmount개씩 자른 페이지 묶음 수
+// 현재 페이지 그룹
 const pageSetState = atom({
   key: "pageSetState",
   default: 1,
@@ -204,4 +224,7 @@ export {
   pageSetState,
   currPageState,
   pageSetAmountState,
+  displaySettingModalState,
+  // startDateOfChart,
+  // endDateOfChart,
 };

@@ -15,6 +15,7 @@ const useGetBoard = () => {
   return useQuery(["board"], getBoard, {
     onSuccess: (res) => {
       setBoardList(res.data);
+      // console.log(res.data.length, pageAmount)
       
       // pageSet이 1세트 밖에 나오지 않는 경우
       if (res.data.length <= pageAmount * pageSetAmount){

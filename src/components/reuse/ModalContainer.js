@@ -10,6 +10,7 @@ import {
   updateModalState,
   defaultCommentContentState,
   commentSettingCommentId,
+  displaySettingModalState,
 } from "../../atom/atom";
 
 const ModalContainer = ({ children }) => {
@@ -24,6 +25,7 @@ const ModalContainer = ({ children }) => {
   const setUpdateModal = useSetRecoilState(updateModalState);
   const setCommentState = useSetRecoilState(defaultCommentContentState);
   const setCommentId = useSetRecoilState(commentSettingCommentId);
+  const setDisplaySettingModal = useSetRecoilState(displaySettingModalState);
 
   const handleClickBackground = (e) => {
     // 게시글 작성 모달 비활성화
@@ -46,6 +48,8 @@ const ModalContainer = ({ children }) => {
     setCommentState("");
     // 선택한 댓글 commentId 값 초기화
     setCommentId(0);
+    // displaySetting Modal 비활성화
+    setDisplaySettingModal(false);
   };
 
   const handleClickModal = (event) => {

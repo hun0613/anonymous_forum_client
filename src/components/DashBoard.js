@@ -1,7 +1,41 @@
 import { useRecoilValue } from "recoil";
 import { boardListState } from "../atom/atom";
+import ChartComp from "./ChartComp";
+import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
+import useWindowSize from "../hooks/useWindowSize";
+import useTransformDateForm from "../hooks/useTransformDateFormat";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+const transformDateForm = (date) => {
+  const year = date.getFullYear();
+  let month = 0;
+  let day = 0;
+
+  if (date.getMonth() + 1 < 10) {
+    month = `0${date.getMonth() + 1}`;
+  } else {
+    month = date.getMonth() + 1;
+  }
+
+  if (date.getDate() < 10) {
+    day = `0${date.getDate()}`;
+  } else {
+    day = date.getDate();
+  }
+
+  return `${year}-${month}-${day}`;
+};
 
 const DashBoard = () => {
+  const queryClient = useQueryClient();
+
+  // useState
+  const [startDateOfChart, setStartDateOfChart] = useState(
+    useTransformDateForm(new Date(new Date().getTime() - 6 * 24 * 60 * 60 * 1000))
+  );
+  const [endDateOfChart, setEndDateOfChart] = useState(useTransformDateForm(new Date()));
+
   // recoilValue
   const boardList = useRecoilValue(boardListState);
 
@@ -17,6 +51,27 @@ const DashBoard = () => {
   const previosMonthData = boardList.filter(
     (el) => new Date(el.createAt).getMonth() + 1 === currMonth - 1
   );
+
+  // 화면 가로 사이즈
+  const width = useWindowSize();
+
+  const handleClickPreviosBtn = () => {
+    setStartDateOfChart(
+      transformDateForm(new Date(new Date(startDateOfChart).getTime() - 6 * 24 * 60 * 60 * 1000))
+    );
+    setEndDateOfChart(
+      transformDateForm(new Date(new Date(endDateOfChart).getTime() - 6 * 24 * 60 * 60 * 1000))
+    );
+  };
+
+  const handleClickNextBtn = () => {
+    setStartDateOfChart(
+      transformDateForm(new Date(new Date(startDateOfChart).getTime() + 6 * 24 * 60 * 60 * 1000))
+    );
+    setEndDateOfChart(
+      transformDateForm(new Date(new Date(endDateOfChart).getTime() + 6 * 24 * 60 * 60 * 1000))
+    );
+  };
 
   return (
     <>
@@ -83,6 +138,45 @@ const DashBoard = () => {
             </div>
           </div>
         </div>
+        {/* chart */}
+        <div className="w-full h-fit flex flex-col justify-center items-center font-NMSNeo5 tablet:text-2xl text-xl text-textColor/70 mt-8 mb-2">
+          Chart
+        </div>
+        {width > 790 ? (
+          <div className="w-full h-[500px] flex tablet:flex-row flex-col justify-center items-center bg-white rounded-md drop-shadow-md mt-5 p-5">
+            <div
+              className="w-10 h-8 flex flex-row justify-center items-center bg-pointColor/80 hover:bg-pointColor/30 rounded-md p-1 mr-5 cursor-pointer"
+              onClick={handleClickPreviosBtn}
+            >
+              <IoChevronBackSharp className=" text-2xl text-white" />
+            </div>
+            <ChartComp startDateProps={startDateOfChart} endDateProps={endDateOfChart} />
+            <div
+              className="w-10 h-8 flex flex-row justify-center items-center bg-pointColor/80 hover:bg-pointColor/30 rounded-md p-1 ml-5 cursor-pointer"
+              onClick={handleClickNextBtn}
+            >
+              <IoChevronForwardSharp className=" text-2xl text-white" />
+            </div>
+          </div>
+        ) : (
+          <div className="w-full h-[500px] flex tablet:flex-row flex-col justify-center items-center bg-white rounded-md drop-shadow-md mt-5 p-5">
+            <ChartComp startDateProps={startDateOfChart} endDateProps={endDateOfChart} />
+            <div className="w-full h-fit flex flex-row justify-center items-center mt-2 mb-2">
+              <button
+                className="w-10 h-8 flex flex-row justify-center items-center bg-pointColor/80 rounded-md p-1 mr-5"
+                onClick={handleClickPreviosBtn}
+              >
+                <IoChevronBackSharp className=" text-2xl text-white" />
+              </button>
+              <button
+                className="w-10 h-8 flex flex-row justify-center items-center bg-pointColor/80 rounded-md p-1"
+                onClick={handleClickNextBtn}
+              >
+                <IoChevronForwardSharp className=" text-2xl text-white" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

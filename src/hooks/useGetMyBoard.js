@@ -9,6 +9,8 @@ import {
   adminName,
   pageAmountState,
   totalPageAmountState,
+  pageSetState,
+  currPageState
 } from "../atom/atom";
 
 const useGetMyBoard = (email) => {
@@ -18,7 +20,8 @@ const useGetMyBoard = (email) => {
   const setAdminState = useSetRecoilState(adminState);
   const setAdminName = useSetRecoilState(adminName);
   const setTotalPageAmount = useSetRecoilState(totalPageAmountState); // 전체 페이지 갯수
-
+  const setPageSetState = useSetRecoilState(pageSetState);
+  const setCurrPageState = useSetRecoilState(currPageState);
   // recoilValue
   const pageAmount = useRecoilValue(pageAmountState); // 한 페이지당 보여줄 게시글 수
 
@@ -30,6 +33,8 @@ const useGetMyBoard = (email) => {
       setUserState(true);
       setAdminState(false);
       setAdminName("");
+      setPageSetState(1);
+      setCurrPageState(1);
 
       // pageSet이 1세트 밖에 나오지 않는 경우
       if (res.data.length <= pageAmount * 10) {

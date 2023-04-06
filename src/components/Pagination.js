@@ -6,7 +6,7 @@ import {
   boardListState,
   pageAmountState,
   currPageState,
-  pageSetAmountState
+  pageSetAmountState,
 } from "../atom/atom";
 
 const Pagination = () => {
@@ -145,7 +145,7 @@ const Pagination = () => {
 
         {/* END btn */}
         {currPage === totalPageAmount && pageSet === maxPageSet ? (
-          <div className="w-fit h-fit flex flex-row justify-center items-center font-NMSNeo5 tablet:text-sm text-xs text-pointColor/20 bg-white drop-shadow-md p-2 rounded mr-4 cursor-default">
+          <div className="w-fit h-fit flex flex-row justify-center items-center font-NMSNeo5 tablet:text-sm text-xs text-pointColor/20 bg-white drop-shadow-md p-2 rounded cursor-default">
             END
           </div>
         ) : (

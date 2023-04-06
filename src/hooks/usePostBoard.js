@@ -17,6 +17,7 @@ const usePostBoard = () => {
 
   return useMutation(postBoard, {
     onSuccess: (res) => {
+      queryClient.invalidateQueries(["chartWeek"]);
       if (user) {
         setTrigger(!trigger);
       } else {

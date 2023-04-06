@@ -16,16 +16,16 @@ const useDeleteComment = () => {
 
   return useMutation(deleteComment, {
     onSuccess: (res) => {
-        if (user) {
-            setTrigger(!trigger);
-          } else {
-            queryClient.invalidateQueries(["board"]);
-          }
-    
-          toast.success("삭제되었습니다", {
-            autoClose: 2000,
-            position: toast.POSITION.TOP_CENTER,
-          });
+      if (user) {
+        setTrigger(!trigger);
+      } else {
+        queryClient.invalidateQueries(["board"]);
+      }
+
+      toast.success("삭제되었습니다", {
+        autoClose: 2000,
+        position: toast.POSITION.TOP_CENTER,
+      });
     },
     onError: (err) => {
       console.log(err);

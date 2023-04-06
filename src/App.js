@@ -22,6 +22,7 @@ import {
   updateCommentModalState,
   currPageState,
   pageAmountState,
+  displaySettingModalState,
 } from "./atom/atom";
 import useGetBoard from "./hooks/useGetBoard";
 import ModalContainer from "./components/reuse/ModalContainer";
@@ -38,11 +39,14 @@ import Footer from "./components/Footer";
 import UpdateCommentModal from "./components/UpdateCommentModal";
 import Pagination from "./components/Pagination";
 import MobilePagination from "./components/MobilePagination";
+import DisplaySettingModal from "./components/DisplaySettingModal";
+import MobileDisplaySettingModal from "./components/MobileDisplaySettingModal";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import useWindowSize from "./hooks/useWindowSize";
 import useGetOption from "./hooks/useGetOption";
+import useTransformDateForm from "./hooks/useTransformDateFormat";
 
 function App() {
   // setRecoilValue
@@ -65,6 +69,13 @@ function App() {
   const activeUpdateCommentModal = useRecoilValue(updateCommentModalState);
   const currPage = useRecoilValue(currPageState);
   const pageAmount = useRecoilValue(pageAmountState);
+  const activeDisplaySettingModal = useRecoilValue(displaySettingModalState);
+
+  // useState
+  const [startDateOfChart, setStartDateOfChart] = useState(useTransformDateForm(new Date(new Date().getTime() - 6 * 24 * 60 * 60 * 1000)));
+  const [endDateOfChart, setEndDateOfChart] = useState(useTransformDateForm(new Date()));
+
+
 
   // 게시글 조회 api요청함수 호출
   useGetBoard();
@@ -184,6 +195,13 @@ function App() {
         {activeUpdateCommentModal ? (
           <ModalContainer>
             <UpdateCommentModal />
+          </ModalContainer>
+        ) : null}
+
+        {/* 디스플레이 설정 모달 */}
+        {activeDisplaySettingModal ? (
+          <ModalContainer>
+            {width > 790 ? <DisplaySettingModal /> : <MobileDisplaySettingModal />}
           </ModalContainer>
         ) : null}
       </div>
