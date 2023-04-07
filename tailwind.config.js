@@ -3,6 +3,9 @@ module.exports = {
   content: ["./src/**/*.{html,js}"],
   theme: {
     extend: {
+      transitionProperty: {
+        height: "height",
+      },
       fontFamily: {
         NMSNeo1: ["NMSNeo1"],
         NMSNeo2: ["NMSNeo2"],

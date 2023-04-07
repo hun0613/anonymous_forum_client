@@ -5,7 +5,6 @@ import { IoChevronBackSharp, IoChevronForwardSharp } from "react-icons/io5";
 import useWindowSize from "../hooks/useWindowSize";
 import useTransformDateForm from "../hooks/useTransformDateFormat";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 
 const transformDateForm = (date) => {
   const year = date.getFullYear();
@@ -28,13 +27,18 @@ const transformDateForm = (date) => {
 };
 
 const DashBoard = () => {
-  const queryClient = useQueryClient();
+  // 날짜 정규표현식
+  const dateRegex = /^(?=\d)(?:(?:31(?!.(?:0?[2469]|11))|(?:30|29)(?!.0?2)|29(?=.0?2.(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(?:\x20|$))|(?:2[0-8]|1\d|0?[1-9]))([-.\/])(?:1[012]|0?[1-9])\1(?:1[6-9]|[2-9]\d)?\d\d(?:(?=\x20\d)\x20|$))?(((0?[1-9]|1[012])(:[0-5]\d){0,2}(\x20[AP]M))|([01]\d|2[0-3])(:[0-5]\d){1,2})?$/;
 
   // useState
   const [startDateOfChart, setStartDateOfChart] = useState(
     useTransformDateForm(new Date(new Date().getTime() - 6 * 24 * 60 * 60 * 1000))
   );
   const [endDateOfChart, setEndDateOfChart] = useState(useTransformDateForm(new Date()));
+
+  const [periodSetting, setPeriodSetting] = useState(false); // 기간 설정 컴포넌트 활성화 컨트롤
+  const [period, setPeriod] = useState(endDateOfChart);
+  const [checkPeriod, setCheckPeriod] = useState(true);
 
   // recoilValue
   const boardList = useRecoilValue(boardListState);
@@ -57,21 +61,64 @@ const DashBoard = () => {
 
   const handleClickPreviosBtn = () => {
     setStartDateOfChart(
-      transformDateForm(new Date(new Date(startDateOfChart).getTime() - 6 * 24 * 60 * 60 * 1000))
+      transformDateForm(new Date(new Date(startDateOfChart).getTime() - 1 * 24 * 60 * 60 * 1000))
     );
     setEndDateOfChart(
-      transformDateForm(new Date(new Date(endDateOfChart).getTime() - 6 * 24 * 60 * 60 * 1000))
+      transformDateForm(new Date(new Date(endDateOfChart).getTime() - 1 * 24 * 60 * 60 * 1000))
+    );
+    setPeriod(
+      transformDateForm(new Date(new Date(endDateOfChart).getTime() - 1 * 24 * 60 * 60 * 1000))
     );
   };
 
   const handleClickNextBtn = () => {
     setStartDateOfChart(
-      transformDateForm(new Date(new Date(startDateOfChart).getTime() + 6 * 24 * 60 * 60 * 1000))
+      transformDateForm(new Date(new Date(startDateOfChart).getTime() + 1 * 24 * 60 * 60 * 1000))
     );
     setEndDateOfChart(
-      transformDateForm(new Date(new Date(endDateOfChart).getTime() + 6 * 24 * 60 * 60 * 1000))
+      transformDateForm(new Date(new Date(endDateOfChart).getTime() + 1 * 24 * 60 * 60 * 1000))
+    );
+    setPeriod(
+      transformDateForm(new Date(new Date(endDateOfChart).getTime() + 1 * 24 * 60 * 60 * 1000))
     );
   };
+
+  const handleClickSettingPeriod = () => {
+    setPeriodSetting(true);
+  };
+
+  const handleClickConfirmSettingPeriod = () => {
+    if (checkPeriod) {
+      setPeriodSetting(false);
+      setStartDateOfChart(
+        transformDateForm(new Date(new Date(period).getTime() - 6 * 24 * 60 * 60 * 1000))
+      );
+      setEndDateOfChart(period);
+    }
+  };
+
+  const handleChangePeriod = (e) => {
+    setPeriod(e.target.value);
+    if (!checkValidPeriod(e.target.value)) {
+      setCheckPeriod(false);
+    } else {
+      setCheckPeriod(true);
+    }
+  };
+
+  // 윤년까지 고려하는 날짜 유효성 검증 함수
+  const checkValidPeriod = (date) => {
+    const splitDate = date.split("-");
+    const y = parseInt(splitDate[0], 10);
+	  const m = parseInt(splitDate[1], 10);
+	  const d = parseInt(splitDate[2], 10);
+
+    if (dateRegex.test(d+'-'+m+'-'+y)){
+      return true;
+    }else{
+      return false;
+    }
+  }
 
   return (
     <>
@@ -139,11 +186,69 @@ const DashBoard = () => {
           </div>
         </div>
         {/* chart */}
-        <div className="w-full h-fit flex flex-col justify-center items-center font-NMSNeo5 tablet:text-2xl text-xl text-textColor/70 mt-8 mb-2">
+        <div className="w-full h-fit flex flex-col justify-center items-center font-NMSNeo5 tablet:text-2xl text-xl text-textColor/70 mt-8">
           Chart
         </div>
+
+        {/* 기간 설정파트 */}
+        <div
+          className={
+            periodSetting
+              ? "w-full h-[160px] flex flex-col justify-center items-center overflow-hidden mt-3 mb-3 transition-height ease-in-out duration-500"
+              : "w-full h-[80px] flex flex-col justify-center items-center overflow-hidden mt-3 mb-3 transition-height ease-in-out duration-500"
+          }
+        >
+          <div
+            className={
+              periodSetting
+                ? "w-full h-full flex flex-col justify-center items-center transition ease-in-out duration-500 -translate-y-20"
+                : "w-full h-full flex flex-col justify-center items-center transition ease-in-out duration-500 translate-y-10"
+            }
+          >
+            <div className="w-fit h-fit flex flex-col justify-center items-center font-NMSNeo2 tablet:text-sm text-xs text-textColor">
+              {endDateOfChart} 기준 최근 1주일 간 데이터
+            </div>
+            <button
+              className="w-fit h-full flex flex-col justify-center items-center py-1.5 px-4 font-NMSNeo2 tablet:text-xs text-[10px] text-white bg-pointColor hover:bg-pointColor/60 rounded-md mt-3 cursor-pointer"
+              onClick={handleClickSettingPeriod}
+            >
+              기간설정
+            </button>
+          </div>
+          <div
+            className={
+              periodSetting
+                ? "w-full h-full flex flex-col justify-center items-center transition ease-in-out duration-500 -translate-y-7"
+                : "w-full h-full flex flex-col justify-center items-center transition ease-in-out duration-500 translate-y-24"
+            }
+          >
+            <div className="w-fit h-fit flex flex-col justify-center items-center font-NMSNeo2 tablet:text-sm text-xs text-pointColor/80">
+              yyyy-mm-dd 형식으로 작성해주세요
+            </div>
+            <input
+              type="text"
+              placeholder="yyyy-mm-dd"
+              value={period}
+              onChange={handleChangePeriod}
+              className="tablet:w-1/5 w-2/3 h-fit py-2 px-3 font-NMSNeo2 tablet:text-base text-sm text-textColor/80 rounded-md drop-shadow-md text-center outline-none mt-4"
+            />
+            {checkPeriod ? null : (
+              <div className="w-fit h-fit flex flex-col justify-center items-center font-NMSNeo2 tablet:text-sm text-xs text-negativeColor/80 mt-4">
+                형식이 올바르지 않습니다
+              </div>
+            )}
+
+            <button
+              className="w-fit h-full flex flex-col justify-center items-center py-1.5 px-4 font-NMSNeo2 tablet:text-xs text-[10px] text-white bg-pointColor hover:bg-pointColor/60 rounded-md mt-3 cursor-pointer"
+              onClick={handleClickConfirmSettingPeriod}
+            >
+              확 인
+            </button>
+          </div>
+        </div>
+
         {width > 790 ? (
-          <div className="w-full h-[500px] flex tablet:flex-row flex-col justify-center items-center bg-white rounded-md drop-shadow-md mt-5 p-5">
+          <div className="w-full h-[500px] flex tablet:flex-row flex-col justify-center items-center bg-white rounded-md drop-shadow-md mt-2 p-5">
             <div
               className="w-10 h-8 flex flex-row justify-center items-center bg-pointColor/80 hover:bg-pointColor/30 rounded-md p-1 mr-5 cursor-pointer"
               onClick={handleClickPreviosBtn}
@@ -159,7 +264,7 @@ const DashBoard = () => {
             </div>
           </div>
         ) : (
-          <div className="w-full h-[500px] flex tablet:flex-row flex-col justify-center items-center bg-white rounded-md drop-shadow-md mt-5 p-5">
+          <div className="w-full h-[500px] flex tablet:flex-row flex-col justify-center items-center bg-white rounded-md drop-shadow-md mt-2 p-5">
             <ChartComp startDateProps={startDateOfChart} endDateProps={endDateOfChart} />
             <div className="w-full h-fit flex flex-row justify-center items-center mt-2 mb-2">
               <button

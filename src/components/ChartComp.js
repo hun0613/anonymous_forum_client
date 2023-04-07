@@ -65,12 +65,13 @@ const ChartComp = (props) => {
       categories: dateArr,
       title: {
         text: null,
+        // margin : 10,
+        // align: "high"
       },
-      
     },
     yAxis: {
       min: 0,
-      max: 100,
+      max: 50,
       tickInterval: 10,
       title: {
         text: null,
@@ -78,10 +79,10 @@ const ChartComp = (props) => {
       plotLines: [
         {
           color: "#FF4D62",
-          value: seriesData?.reduce((a,b) => a + b) / seriesData?.length, // 소수점 2자리
+          value: (seriesData?.reduce((a, b) => a + b) / seriesData?.length).toFixed(2), // 소수점 2자리
           width: 2,
-          dashStyle: 'ShortDot',
-          zIndex: 4
+          dashStyle: "ShortDot",
+          zIndex: 4,
         },
       ],
     },
@@ -94,7 +95,9 @@ const ChartComp = (props) => {
         data: resultData,
       },
     ],
-    legend: {},
+    legend: {
+      enabled: true,
+    },
   };
 
   return (
