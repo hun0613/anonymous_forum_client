@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const updateBoard = (data) => {
-    return axios.patch("/board", data, {
-        baseURL: "http://192.168.20.65:8080",
-    })
-}
+  return axios.patch("/board", data, {
+    baseURL: process.env.REACT_APP_SERVER_ADDRESS,
+  });
+};
 
 export default updateBoard;

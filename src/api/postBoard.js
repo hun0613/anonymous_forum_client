@@ -8,7 +8,7 @@ const postBoard = ({ title, content, email }) => {
   };
   return axios.post(`/board`, body, {
     // baseURL: "http://localhost:8080",
-    baseURL: "http://192.168.20.65:8080",
+    baseURL: process.env.REACT_APP_SERVER_ADDRESS,
   });
 };
 
